@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
 import { useFetchClassification } from './hooks';
@@ -7,17 +7,14 @@ import { Select, Classification } from './components';
 
 function App() {
   const years = getYears();
-
   const [year, setYear] = useState(years[0]);
-  const [classification, setClassification] = useState([]);
+  const { classification, isError, isLoading } = useFetchClassification({ year });
 
-  const { getClassification } = useFetchClassification();
-
-  useEffect(() => {
-    (async () => {
-      setClassification(await getClassification(year));
-    })();
-  }, [year]);
+  if (isError) {
+    return (
+      <>Infelizmente ocorreu um erro! Recarregue a página.</>
+    );
+  }
 
   return (
     <div>
@@ -26,7 +23,7 @@ function App() {
         <Select onChange={setYear} options={years} />
       </div>
 
-      <Classification classification={classification} />
+      {isLoading ? <>Carregando...</> : <Classification classification={classification} />}
     </div>
   );
 }
