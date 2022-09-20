@@ -10,6 +10,11 @@ function App() {
   const [year, setYear] = useState(years[0]);
   const { classification, isError } = useFetchClassification({ year });
 
+  const handleChangeYear = (newYear) => {
+    document.title = `Campeonato Brasileiro de ${newYear}`;
+    setYear(newYear);
+  };
+
   if (isError) {
     return (
       <span>Infelizmente ocorreu um erro! Recarregue a página.</span>
@@ -20,7 +25,7 @@ function App() {
     <div>
       <div>
         <span>Campeonato brasileiro de </span>
-        <Select onChange={setYear} options={years} />
+        <Select onChange={handleChangeYear} options={years} />
       </div>
 
       {!classification.length
