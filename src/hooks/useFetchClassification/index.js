@@ -5,6 +5,7 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 function useFetchClassification({ year }) {
   const [classification, setClassification] = useState([]);
+  const [isPaused, setIsPaused] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
@@ -39,6 +40,7 @@ function useFetchClassification({ year }) {
     onSuccess: updateClassification,
     revalidateOnFocus: false,
     shouldRetryOnError: false,
+    isPaused: () => isPaused,
   });
 
   useEffect(() => {
@@ -46,22 +48,21 @@ function useFetchClassification({ year }) {
   }, [year]);
 
   useEffect(() => {
-    if (!error) {
-      return;
+    if (error || isPaused) {
+      try {
+        (async () => {
+          setIsPaused(true);
+          setIsLoading(true);
+          const { default: json } = await import('../../../campeonato-brasileiro.json');
+          const response = json[year];
+          updateClassification(response);
+        })();
+      } catch {
+        setIsLoading(false);
+        setIsError(true);
+      }
     }
-
-    try {
-      (async () => {
-        setIsLoading(true);
-        const { default: json } = await import('../../../campeonato-brasileiro.json');
-        const response = json[year];
-        updateClassification(response);
-      })();
-    } catch {
-      setIsLoading(false);
-      setIsError(true);
-    }
-  }, [error]);
+  }, [year, error, isPaused]);
 
   return {
     classification,

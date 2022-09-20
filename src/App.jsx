@@ -8,11 +8,11 @@ import { Select, Classification } from './components';
 function App() {
   const years = getYears();
   const [year, setYear] = useState(years[0]);
-  const { classification, isError, isLoading } = useFetchClassification({ year });
+  const { classification, isError } = useFetchClassification({ year });
 
   if (isError) {
     return (
-      <>Infelizmente ocorreu um erro! Recarregue a página.</>
+      <span>Infelizmente ocorreu um erro! Recarregue a página.</span>
     );
   }
 
@@ -23,7 +23,11 @@ function App() {
         <Select onChange={setYear} options={years} />
       </div>
 
-      {isLoading ? <>Carregando...</> : <Classification classification={classification} />}
+      {!classification.length
+        ? (
+          <span>Carregando...</span>
+        )
+        : <Classification classification={classification} />}
     </div>
   );
 }
